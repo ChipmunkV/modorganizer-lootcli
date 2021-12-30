@@ -1,6 +1,10 @@
 #ifndef LOOTTHREAD_H
 #define LOOTTHREAD_H
 
+#include <mutex>
+#include <QJsonArray>
+#include "loot/enum/log_level.h"
+#include "loot/game_interface.h"
 #include <lootcli/lootcli.h>
 #include "game_settings.h"
 

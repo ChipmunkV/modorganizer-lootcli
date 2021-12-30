@@ -1,4 +1,14 @@
 #include "lootthread.h"
+#include <iostream>
+#include <boost/algorithm/string/replace.hpp>
+#include <boost/algorithm/string/trim.hpp>
+#include <boost/locale/generator.hpp>
+#include <QDir>
+#include <QFileInfo>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include "cpptoml.h"
+#include "loot/api.h"
 #include "game_settings.h"
 #include "version.h"
 
@@ -99,15 +109,17 @@ void LOOTWorker::setLogLevel(loot::LogLevel level)
 }
 
 fs::path GetLOOTAppData() {
-    TCHAR path[MAX_PATH];
-
-    HRESULT res = ::SHGetFolderPath(nullptr, CSIDL_LOCAL_APPDATA, nullptr, SHGFP_TYPE_CURRENT, path);
-
-    if (res == S_OK) {
-        return fs::path(path) / "LOOT";
-    } else {
-        return fs::path("");
-    }
+//    TCHAR path[MAX_PATH];
+//
+//    HRESULT res = ::SHGetFolderPath(nullptr, CSIDL_LOCAL_APPDATA, nullptr, SHGFP_TYPE_CURRENT, path);
+//
+//    if (res == S_OK) {
+//        return fs::path(path) / "LOOT";
+//    } else {
+//        return fs::path("");
+//    }
+    std::cerr << "FIXME: Not implemented" + std::string(" \e]8;;eclsrc://") + __FILE__ + ":" + std::to_string(__LINE__) + "\a" + __FILE__ + ":" + std::to_string(__LINE__) + "\e]8;;\a\n"; assert(false && "Not implemented");
+    return fs::path("");
 }
 
 fs::path LOOTWorker::masterlistPath() const
@@ -331,7 +343,7 @@ int LOOTWorker::run()
         fs::path userlist = userlistPath();
         db->LoadLists(
           masterlistPath().string(),
-          fs::exists(userlist) ? userlistPath().string() : fs::path());
+          fs::exists(userlist) ? fs::path(userlistPath().string()) : fs::path());
 
         progress(Progress::ReadingPlugins);
         const std::vector<std::string> pluginsList = getPluginsList(*gameHandle);
@@ -402,7 +414,11 @@ std::vector<std::string> LOOTWorker::getPluginsList(loot::GameInterface& game) c
           .absoluteFilePath()).toStdString();
 
       const auto data = QDir::toNativeSeparators(
+#if _WIN32
         QDir(QString::fromStdWString(dataPath().native())).absolutePath())
+#else
+        QDir(QString::fromStdString(dataPath().native())).absolutePath())
+#endif
           .toStdString();
 
       log(
@@ -479,7 +495,7 @@ std::string LOOTWorker::createJsonReport(
   const auto end = std::chrono::high_resolution_clock::now();
 
   set(root, "stats", QJsonObject{
-    {"time", std::chrono::duration_cast<std::chrono::milliseconds>(end - m_startTime).count()},
+    {"time", (qint64)std::chrono::duration_cast<std::chrono::milliseconds>(end - m_startTime).count()},
     {"lootcliVersion", LOOTCLI_VERSION_STRING},
     {"lootVersion", QString::fromStdString(loot::LootVersion::GetVersionString())}
   });

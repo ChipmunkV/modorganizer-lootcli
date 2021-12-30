@@ -1,3 +1,5 @@
+#include <iostream>
+#include <boost/lexical_cast.hpp>
 #include "lootthread.h"
 #include <lootcli/lootcli.h>
 
@@ -50,27 +52,32 @@ loot::LogLevel getLogLevel(const std::vector<std::string>& arguments)
   return lootcli::toLootLogLevel(level);
 }
 
+#if _WIN32
 int wWinMain(HINSTANCE, HINSTANCE, LPTSTR, int)
+#else
+int main(int argc, char* argv[])
+#endif
 {
-  _setmode(_fileno(stdout), _O_BINARY);
-  setlocale(LC_ALL, "en.UTF-8");
-
+    std::cerr << "FIXME: Not implemented" + std::string(" \e]8;;eclsrc://") + __FILE__ + ":" + std::to_string(__LINE__) + "\a" + __FILE__ + ":" + std::to_string(__LINE__) + "\e]8;;\a\n"; assert(false && "Not implemented");
+//  _setmode(_fileno(stdout), _O_BINARY);
+//  setlocale(LC_ALL, "en.UTF-8");
+//
   std::vector<std::string> arguments;
-  int argc;
-  LPWSTR *argv = CommandLineToArgvW(GetCommandLineW(), &argc);
-
-    if (argv)
-    {
-        for (int i = 0; i < argc; ++i)
-        {
-            size_t num_converted;
-            std::vector<char> arg(wcslen(argv[i]) * sizeof(wchar_t) + 1);
-
-            wcstombs_s(&num_converted, &(arg[0]), arg.size(), argv[i], arg.size() - 1);
-
-            arguments.push_back(&(arg[0]));
-        }
-    }
+//  int argc;
+//  LPWSTR *argv = CommandLineToArgvW(GetCommandLineW(), &argc);
+//
+//    if (argv)
+//    {
+//        for (int i = 0; i < argc; ++i)
+//        {
+//            size_t num_converted;
+//            std::vector<char> arg(wcslen(argv[i]) * sizeof(wchar_t) + 1);
+//
+//            wcstombs_s(&num_converted, &(arg[0]), arg.size(), argv[i], arg.size() - 1);
+//
+//            arguments.push_back(&(arg[0]));
+//        }
+//    }
 
     // design rationale: this was designed to have the actual loot stuff run in a separate thread. That turned
     // out to be unnecessary atm.
